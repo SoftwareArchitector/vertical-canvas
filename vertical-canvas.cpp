@@ -6094,13 +6094,25 @@ void CanvasDock::CreateStreamOutput(std::vector<StreamServer>::iterator it)
 	//password
 	obs_service_update(it->service, s);
 	obs_data_release(s);
+
 	const char *type = nullptr;
+	obs_service_t *mainService;
+
 #ifdef _WIN32
 	auto handle = os_dlopen("obs");
 #else
 	auto handle = dlopen(nullptr, RTLD_LAZY);
 #endif
 	if (handle) {
+		// const auto main_window = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+		// const auto mainWindow = reinterpret_cast<OBSBasic *>(obs_frontend_get_main_window());
+		// auto res = QMetaObject::invokeMethod(main_window, "GetService");
+
+		auto service_func = (obs_service_t * (*)(const char *)) os_dlsym(handle, "obs_get_service_by_name");
+		if (service_func) {
+			mainService = service_func("default_service");
+		}
+
 		auto type_func = (const char *(*)(obs_service_t *))os_dlsym(handle, "obs_service_get_output_type");
 		if (!type_func)
 			type_func = (const char *(*)(obs_service_t *))os_dlsym(handle, "obs_service_get_preferred_output_type");
@@ -6109,20 +6121,36 @@ void CanvasDock::CreateStreamOutput(std::vector<StreamServer>::iterator it)
 		}
 		if (!type) {
 			const char *url = nullptr;
+			const char *key = nullptr;
+
 			auto url_func = (const char *(*)(obs_service_t *))os_dlsym(handle, "obs_service_get_url");
 			if (url_func) {
 				url = url_func(it->service);
 			} else {
 				auto info_func = (const char *(*)(obs_service_t *,
 								  uint32_t))os_dlsym(handle, "obs_service_get_connect_info");
-				if (info_func)
-					url = info_func(it->service, 0); // OBS_SERVICE_CONNECT_INFO_SERVER_URL
+				if (info_func) {
+					url = info_func(mainService ? mainService : it->service,
+							0); // OBS_SERVICE_CONNECT_INFO_SERVER_URL
+					key = info_func(mainService ? mainService : it->service,
+							2); // OBS_SERVICE_CONNECT_INFO_STREAM_KEY
+				}
 			}
 			type = "rtmp_output";
 			if (url != nullptr && strncmp(url, "ftl", 3) == 0) {
 				type = "ftl_output";
 			} else if (url != nullptr && strncmp(url, "rtmp", 4) != 0) {
 				type = "ffmpeg_mpegts_muxer";
+			} else {
+				std::string mainAltKey = key;
+				mainAltKey.append(".a1");
+
+				auto s = obs_data_create();
+				obs_data_set_string(s, "server", url);
+				obs_data_set_string(s, "key", mainAltKey.c_str());
+				obs_data_set_string(s, "bearer_token", mainAltKey.c_str());
+				obs_service_update(it->service, s);
+				obs_data_release(s);
 			}
 		}
 		os_dlclose(handle);
@@ -7535,14 +7563,14 @@ QIcon CanvasDock::GetGroupIcon() const
 void CanvasDock::MainStreamStart()
 {
 	CheckReplayBuffer(true);
-	if (streamingMatchMain)
+	if (streamingMatchMain || true)
 		StartStream();
 }
 
 void CanvasDock::MainStreamStop()
 {
 	CheckReplayBuffer();
-	if (streamingMatchMain)
+	if (streamingMatchMain || true)
 		StopStream();
 }
 
