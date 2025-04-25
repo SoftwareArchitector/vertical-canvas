@@ -6114,11 +6114,15 @@ void CanvasDock::CreateStreamOutput(std::vector<StreamServer>::iterator it)
 		}
 
 		auto type_func = (const char *(*)(obs_service_t *))os_dlsym(handle, "obs_service_get_output_type");
-		if (!type_func)
+		if (!type_func) {
 			type_func = (const char *(*)(obs_service_t *))os_dlsym(handle, "obs_service_get_preferred_output_type");
+		}
 		if (type_func) {
 			type = type_func(it->service);
 		}
+
+		blog(LOG_INFO, "[Vertical Canvas] Stream type=%s (should be null for restream alt output)", type ? type : "null");
+
 		if (!type) {
 			const char *url = nullptr;
 			const char *key = nullptr;
@@ -6136,6 +6140,7 @@ void CanvasDock::CreateStreamOutput(std::vector<StreamServer>::iterator it)
 							2); // OBS_SERVICE_CONNECT_INFO_STREAM_KEY
 				}
 			}
+
 			type = "rtmp_output";
 			if (url != nullptr && strncmp(url, "ftl", 3) == 0) {
 				type = "ftl_output";
@@ -6151,6 +6156,8 @@ void CanvasDock::CreateStreamOutput(std::vector<StreamServer>::iterator it)
 				obs_data_set_string(s, "bearer_token", mainAltKey.c_str());
 				obs_service_update(it->service, s);
 				obs_data_release(s);
+
+				blog(LOG_INFO, "[Vertical Canvas] Setup restream .a1 output, url=%s", url);
 			}
 		}
 		os_dlclose(handle);
