@@ -7569,6 +7569,8 @@ QIcon CanvasDock::GetGroupIcon() const
 
 void CanvasDock::MainStreamStart()
 {
+	blog(LOG_INFO, "[Vertical Canvas] Main stream start");
+
 	CheckReplayBuffer(true);
 	if (streamingMatchMain || true)
 		StartStream();
@@ -7576,6 +7578,8 @@ void CanvasDock::MainStreamStart()
 
 void CanvasDock::MainStreamStop()
 {
+	blog(LOG_INFO, "[Vertical Canvas] Main stream stop");
+
 	CheckReplayBuffer();
 	if (streamingMatchMain || true)
 		StopStream();
