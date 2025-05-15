@@ -6147,17 +6147,22 @@ void CanvasDock::CreateStreamOutput(std::vector<StreamServer>::iterator it)
 			} else if (url != nullptr && strncmp(url, "rtmp", 4) != 0) {
 				type = "ffmpeg_mpegts_muxer";
 			} else {
+				std::string mainUrl = url;
+				auto appPos = mainUrl.rfind("/live");
+				if (appPos != std::string::npos)
+					mainUrl.replace(appPos, 5, "/vertical");
+
 				std::string mainAltKey = key;
-				mainAltKey.append(".a1");
+				// mainAltKey.append(".a1");
 
 				auto s = obs_data_create();
-				obs_data_set_string(s, "server", url);
+				obs_data_set_string(s, "server", mainUrl.c_str());
 				obs_data_set_string(s, "key", mainAltKey.c_str());
 				obs_data_set_string(s, "bearer_token", mainAltKey.c_str());
 				obs_service_update(it->service, s);
 				obs_data_release(s);
 
-				blog(LOG_INFO, "[Vertical Canvas] Setup restream .a1 output, url=%s", url);
+				blog(LOG_INFO, "[Vertical Canvas] Setup restream output, url=%s", url);
 			}
 		}
 		os_dlclose(handle);
