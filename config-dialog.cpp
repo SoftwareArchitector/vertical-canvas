@@ -360,36 +360,36 @@ OBSBasicSettings::OBSBasicSettings(CanvasDock *canvas_dock, QMainWindow *parent)
 	//streamingLayout->addWidget(streamingMatchMain);
 
 	otherHotkey = nullptr;
-	hotkey = GetHotkeyByName("VerticalCanvasDockStartStreaming");
-	if (hotkey && false) {
-		auto id = obs_hotkey_get_id(hotkey);
-		std::vector<obs_key_combination_t> combos = GetCombosForHotkey(id);
-		auto hn = obs_hotkey_get_name(hotkey);
-		auto hw = new OBSHotkeyWidget(this, id, hn, combos);
-		otherHotkey = hw;
-		auto label = new OBSHotkeyLabel;
-		label->setText(QString::fromUtf8(obs_module_text("StartStreamingHotkey")));
-		hw->label = label;
-		streamingLayout->addRow(label, hw);
-		hotkeys.push_back(hw);
-	}
+	//hotkey = GetHotkeyByName("VerticalCanvasDockStartStreaming");
+	//if (hotkey) {
+	//	auto id = obs_hotkey_get_id(hotkey);
+	//	std::vector<obs_key_combination_t> combos = GetCombosForHotkey(id);
+	//	auto hn = obs_hotkey_get_name(hotkey);
+	//	auto hw = new OBSHotkeyWidget(this, id, hn, combos);
+	//	otherHotkey = hw;
+	//	auto label = new OBSHotkeyLabel;
+	//	label->setText(QString::fromUtf8(obs_module_text("StartStreamingHotkey")));
+	//	hw->label = label;
+	//	streamingLayout->addRow(label, hw);
+	//	hotkeys.push_back(hw);
+	//}
 
-	hotkey = GetHotkeyByName("VerticalCanvasDockStopStreaming");
-	if (hotkey && false) {
-		auto id = obs_hotkey_get_id(hotkey);
-		std::vector<obs_key_combination_t> combos = GetCombosForHotkey(id);
-		auto hn = obs_hotkey_get_name(hotkey);
-		auto hw = new OBSHotkeyWidget(this, id, hn, combos);
-		auto label = new OBSHotkeyLabel;
-		label->setText(QString::fromUtf8(obs_module_text("StopStreamingHotkey")));
-		hw->label = label;
-		streamingLayout->addRow(label, hw);
-		hotkeys.push_back(hw);
-		if (otherHotkey) {
-			hw->label->pairPartner = otherHotkey->label;
-			otherHotkey->label->pairPartner = hw->label;
-		}
-	}
+	//hotkey = GetHotkeyByName("VerticalCanvasDockStopStreaming");
+	//if (hotkey) {
+	//	auto id = obs_hotkey_get_id(hotkey);
+	//	std::vector<obs_key_combination_t> combos = GetCombosForHotkey(id);
+	//	auto hn = obs_hotkey_get_name(hotkey);
+	//	auto hw = new OBSHotkeyWidget(this, id, hn, combos);
+	//	auto label = new OBSHotkeyLabel;
+	//	label->setText(QString::fromUtf8(obs_module_text("StopStreamingHotkey")));
+	//	hw->label = label;
+	//	streamingLayout->addRow(label, hw);
+	//	hotkeys.push_back(hw);
+	//	if (otherHotkey) {
+	//		hw->label->pairPartner = otherHotkey->label;
+	//		otherHotkey->label->pairPartner = hw->label;
+	//	}
+	//}
 
 	streamingGroup->setLayout(streamingLayout);
 
@@ -1117,10 +1117,10 @@ void OBSBasicSettings::AddServer()
 
 void OBSBasicSettings::LoadSettings()
 {
-	if (!canvasDock->newer_version_available.isEmpty() && false) {
-		newVersion->setText(QString::fromUtf8(obs_module_text("NewVersion")).arg(canvasDock->newer_version_available));
-		newVersion->setVisible(true);
-	}
+	//if (!canvasDock->newer_version_available.isEmpty()) {
+	//	newVersion->setText(QString::fromUtf8(obs_module_text("NewVersion")).arg(canvasDock->newer_version_available));
+	//	newVersion->setVisible(true);
+	//}
 
 	resolution->setCurrentText(QString::number(canvasDock->canvas_width) + "x" + QString::number(canvasDock->canvas_height));
 	bool enable = !obs_output_active(canvasDock->recordOutput) && !obs_output_active(canvasDock->virtualCamOutput);
