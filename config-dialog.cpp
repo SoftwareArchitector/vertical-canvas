@@ -1061,7 +1061,7 @@ void OBSBasicSettings::SetAdvancedIcon(const QIcon &icon)
 
 void OBSBasicSettings::AddServer()
 {
-	int idx = (int)servers.size();
+	//int idx = (int)servers.size();
 	auto serverGroup = new QGroupBox;
 	serverGroup->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 	serverGroup->setStyleSheet(QString("QGroupBox{background-color: %1; padding-top: 4px;}")
