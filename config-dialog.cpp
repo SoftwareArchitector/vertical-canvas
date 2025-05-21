@@ -45,13 +45,13 @@ OBSBasicSettings::OBSBasicSettings(CanvasDock *canvas_dock, QMainWindow *parent)
 	listwidgetitem->setIcon(QIcon(QString::fromUtf8(":/settings/images/settings/output.svg")));
 	listwidgetitem->setText(QString::fromUtf8(obs_module_text("Recording")));
 
-	listwidgetitem = new QListWidgetItem(listWidget);
-	listwidgetitem->setIcon(canvasDock->GetIconFromType(OBS_ICON_TYPE_UNKNOWN));
-	listwidgetitem->setText(QString::fromUtf8(obs_module_text("Help")));
+	//listwidgetitem = new QListWidgetItem(listWidget);
+	//listwidgetitem->setIcon(canvasDock->GetIconFromType(OBS_ICON_TYPE_UNKNOWN));
+	//listwidgetitem->setText(QString::fromUtf8(obs_module_text("Help")));
 
-	listwidgetitem = new QListWidgetItem(listWidget);
-	listwidgetitem->setIcon(QIcon(QString::fromUtf8(":/aitum/media/aitum.png")));
-	listwidgetitem->setText(QString::fromUtf8(obs_module_text("SupportButton")));
+	//listwidgetitem = new QListWidgetItem(listWidget);
+	//listwidgetitem->setIcon(QIcon(QString::fromUtf8(":/aitum/media/aitum.png")));
+	//listwidgetitem->setText(QString::fromUtf8(obs_module_text("SupportButton")));
 
 	listWidget->setCurrentRow(0);
 	listWidget->setSpacing(1);
@@ -91,7 +91,7 @@ OBSBasicSettings::OBSBasicSettings(CanvasDock *canvas_dock, QMainWindow *parent)
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setLineWidth(0);
 	scrollArea->setFrameShape(QFrame::NoFrame);
-	settingsPages->addWidget(scrollArea);
+	// settingsPages->addWidget(scrollArea); // Remove Help page
 
 	// Support page
 	QWidget *supportPage = new QWidget;
@@ -111,7 +111,7 @@ OBSBasicSettings::OBSBasicSettings(CanvasDock *canvas_dock, QMainWindow *parent)
 	supportLayout->addWidget(supportLabel, 1);
 	supportPageLayout->addWidget(supportInfoBox, 1, Qt::AlignTop);
 
-	settingsPages->addWidget(supportPage);
+	// settingsPages->addWidget(supportPage); // Remove support page
 
 	connect(listWidget, &QListWidget::currentRowChanged, settingsPages, &QStackedWidget::setCurrentIndex);
 
