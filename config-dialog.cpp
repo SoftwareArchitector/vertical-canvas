@@ -322,32 +322,32 @@ OBSBasicSettings::OBSBasicSettings(CanvasDock *canvas_dock, QMainWindow *parent)
 
 	streamingLayout->addRow(streaming_title_layout);
 
-	if (!canvasDock->disable_stream_settings && false) {
-		auto hl = new QHBoxLayout;
-		auto addButton = new QPushButton(QIcon(QString::fromUtf8(":/res/images/plus.svg")),
-						 QString::fromUtf8(obs_frontend_get_locale_string("Add")));
-		addButton->setProperty("themeID", QVariant(QString::fromUtf8("addIconSmall")));
-		addButton->setProperty("class", "icon-plus");
-		connect(addButton, &QPushButton::clicked, [this] { AddServer(); });
-		hl->addWidget(addButton);
-		auto removeButton = new QPushButton(QIcon(":/res/images/minus.svg"),
-						    QString::fromUtf8(obs_frontend_get_locale_string("Remove")));
-		removeButton->setProperty("themeID", QVariant(QString::fromUtf8("removeIconSmall")));
-		removeButton->setProperty("class", "icon-minus");
-		connect(removeButton, &QPushButton::clicked, [this] {
-			if (servers.size() <= 1)
-				return;
-			auto idx = (int)servers.size();
-			streamingLayout->removeRow(idx);
-			server_names.pop_back();
-			servers.pop_back();
-			keys.pop_back();
-			servers_enabled.pop_back();
-		});
-		hl->addWidget(removeButton);
+	//if (!canvasDock->disable_stream_settings) {
+	//	auto hl = new QHBoxLayout;
+	//	auto addButton = new QPushButton(QIcon(QString::fromUtf8(":/res/images/plus.svg")),
+	//					 QString::fromUtf8(obs_frontend_get_locale_string("Add")));
+	//	addButton->setProperty("themeID", QVariant(QString::fromUtf8("addIconSmall")));
+	//	addButton->setProperty("class", "icon-plus");
+	//	connect(addButton, &QPushButton::clicked, [this] { AddServer(); });
+	//	hl->addWidget(addButton);
+	//	auto removeButton = new QPushButton(QIcon(":/res/images/minus.svg"),
+	//					    QString::fromUtf8(obs_frontend_get_locale_string("Remove")));
+	//	removeButton->setProperty("themeID", QVariant(QString::fromUtf8("removeIconSmall")));
+	//	removeButton->setProperty("class", "icon-minus");
+	//	connect(removeButton, &QPushButton::clicked, [this] {
+	//		if (servers.size() <= 1)
+	//			return;
+	//		auto idx = (int)servers.size();
+	//		streamingLayout->removeRow(idx);
+	//		server_names.pop_back();
+	//		servers.pop_back();
+	//		keys.pop_back();
+	//		servers_enabled.pop_back();
+	//	});
+	//	hl->addWidget(removeButton);
 
-		streamingLayout->addRow(hl);
-	}
+	//	streamingLayout->addRow(hl);
+	//}
 
 	streamingVideoBitrate = new QSpinBox;
 	streamingVideoBitrate->setSuffix(" Kbps");
