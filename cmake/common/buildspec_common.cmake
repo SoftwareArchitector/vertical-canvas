@@ -68,9 +68,8 @@ function(_setup_obs_studio)
     set(_cmake_version "2.0.0")
   elseif(OS_MACOS)
     message(STATUS "Check SDK path")
-    COMMAND "xcrun --show-sdk-path"
+    COMMAND xcrun --show-sdk-path
 
-    #  
     message(STATUS "Add special cmake variables (${CMAKE_OSX_SYSROOT})")
 
     set(_cmake_generator "Xcode")
