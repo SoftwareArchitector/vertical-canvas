@@ -70,12 +70,12 @@ function(_setup_obs_studio)
     message(STATUS "Check SDK path")
     COMMAND "xcrun --show-sdk-path"
 
-    #  -DCMAKE_OSX_SYSROOT='/somewhere/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk'
+    #  
     message(STATUS "Add special cmake variables (${CMAKE_OSX_SYSROOT})")
 
     set(_cmake_generator "Xcode")
     set(_cmake_arch "-DCMAKE_OSX_ARCHITECTURES:STRING='arm64;x86_64'")
-    set(_cmake_extra "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    set(_cmake_extra "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -DCMAKE_OSX_SYSROOT='/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk'")
     set(_cmake_version "3.0.0")
   endif()
 
