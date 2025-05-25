@@ -206,11 +206,11 @@ function(_check_dependencies)
     if(NOT EXISTS "${dependencies_dir}/${destination}")
       file(MAKE_DIRECTORY "${dependencies_dir}/${destination}")
       if(dependency STREQUAL obs-studio)
-        message(STATUS "Destination OBS: ${dependencies_dir}")
+        message(STATUS "Destination OBS: ${dependencies_dir}/${file} -> ${dependencies_dir}")
         file(ARCHIVE_EXTRACT INPUT "${dependencies_dir}/${file}" DESTINATION "${dependencies_dir}")
 
         execute_process(
-          COMMAND ls -la /Users/runner/work/vertical-canvas/vertical-canvas/.deps/obs-studio-v31.0.3.20250525
+          COMMAND ls -la /Users/runner/work/vertical-canvas/vertical-canvas/.deps
           OUTPUT_VARIABLE CHECK_UNPACKER_FILES
           OUTPUT_STRIP_TRAILING_WHITESPACE
         )
