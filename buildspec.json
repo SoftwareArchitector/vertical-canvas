@@ -2,7 +2,7 @@
     "dependencies": {
         "obs-studio": {
             "version": "v31.0.3.20250525",
-            "baseUrl": "https://github.com/SoftwareArchitector/obs-studio-vertical/tags",
+            "baseUrl": "https://github.com/SoftwareArchitector/obs-studio-vertical/archive/refs/tags",
             "label": "OBS sources",
             "hashes": {
                 "macos": "be12c3ad0a85713750d8325e4b1db75086223402d7080d0e3c2833d7c5e83c27",
