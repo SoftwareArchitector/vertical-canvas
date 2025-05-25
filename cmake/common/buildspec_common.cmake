@@ -67,18 +67,19 @@ function(_setup_obs_studio)
     set(_cmake_extra "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION} -DCMAKE_ENABLE_SCRIPTING=OFF")
     set(_cmake_version "2.0.0")
   elseif(OS_MACOS)
-    execute_process(
-        COMMAND xcrun --show-sdk-path
-        OUTPUT_VARIABLE CHECK_SDK_PATH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-
-    message(STATUS "Checked SDK path: ${CHECK_SDK_PATH}")
-    message(STATUS "Current CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT}")
+    #execute_process(
+    #    COMMAND xcrun --show-sdk-path
+    #    OUTPUT_VARIABLE CHECK_SDK_PATH
+    #    OUTPUT_STRIP_TRAILING_WHITESPACE
+    #)
+    #
+    #message(STATUS "Checked SDK path: ${CHECK_SDK_PATH}")
+    #message(STATUS "Current CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT}")
+    # -DCMAKE_OSX_SYSROOT='/Applications/Xcode_15.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk'
 
     set(_cmake_generator "Xcode")
     set(_cmake_arch "-DCMAKE_OSX_ARCHITECTURES:STRING='arm64;x86_64'")
-    set(_cmake_extra "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -DCMAKE_OSX_SYSROOT='/Applications/Xcode_15.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk'")
+    set(_cmake_extra "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
     set(_cmake_version "3.0.0")
   endif()
 
