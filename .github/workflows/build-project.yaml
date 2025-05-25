@@ -93,6 +93,7 @@ jobs:
 
           print '::group::Enable Xcode 15.4'
           sudo xcode-select --switch /Applications/Xcode_15.4.app/Contents/Developer
+          # ln -s /Applications/Xcode_15.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk /path/to/link
           print '::endgroup::'
 
           print '::group::Clean Homebrew Environment'
