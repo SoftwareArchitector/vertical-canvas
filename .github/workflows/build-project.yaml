@@ -74,7 +74,7 @@ jobs:
 
   macos-build:
     name: Build for macOS 🍏
-    runs-on: macos-15
+    runs-on: macos-14.2
     needs: check-event
     defaults:
       run:
