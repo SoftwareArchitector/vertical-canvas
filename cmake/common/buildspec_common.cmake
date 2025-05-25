@@ -214,7 +214,7 @@ function(_check_dependencies)
           OUTPUT_VARIABLE CHECK_UNPACKER_FILES
           OUTPUT_STRIP_TRAILING_WHITESPACE
         )
-        message(STATUS "Unpacked folder contains: ${CHECK_UNPACKER_FILES}")
+        message(STATUS "Unpacked folder contains: ${CHECK_UNPACKER_FILES}/obs-studio-vertical-31.0.3.20250525")
 
         # Copy files to original OBS folder
 	execute_process(COMMAND cp -r "${dependencies_dir}/obs-studio-vertical-31.0.3.20250525/*" "${dependencies_dir}/obs-studio-31.0.3.20250525")
