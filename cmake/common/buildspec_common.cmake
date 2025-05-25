@@ -83,6 +83,15 @@ function(_setup_obs_studio)
     set(_cmake_version "3.0.0")
   endif()
 
+  execute_process(
+    COMMAND ls -la /Users/runner/work/vertical-canvas/vertical-canvas/.deps/obs-studio-v31.0.3.20250525
+    OUTPUT_VARIABLE CHECK_DIR_FILES
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  message(STATUS "Working dir: ${dependencies_dir}/${_obs_destination}")
+  message(STATUS "Contains: ${CHECK_DIR_FILES}")
+
+
   message(STATUS "Configure ${label} (${arch})")
   execute_process(
     COMMAND
@@ -109,6 +118,7 @@ function(_setup_obs_studio)
   else()
     set(_cmake_extra "")
   endif()
+
   execute_process(
     COMMAND "${CMAKE_COMMAND}" --install build_${arch} --component Development --config Debug --prefix
             "${dependencies_dir}" ${_cmake_extra}
