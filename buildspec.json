@@ -19,7 +19,7 @@
             }
         },
         "qt6": {
-            "version": "2023-11-03",
+            "version": "2025-05-23",
             "baseUrl": "https://github.com/obsproject/obs-deps/releases/download",
             "label": "Pre-Built Qt6",
             "hashes": {
