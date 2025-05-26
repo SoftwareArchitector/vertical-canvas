@@ -83,13 +83,13 @@ function(_setup_obs_studio)
     set(_cmake_version "3.0.0")
   endif()
 
-  execute_process(
-    COMMAND ls -la /Users/runner/work/vertical-canvas/vertical-canvas/.deps/obs-studio-v31.0.3.20250525
-    OUTPUT_VARIABLE CHECK_DIR_FILES
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  message(STATUS "Working dir: ${dependencies_dir}/${_obs_destination}")
-  message(STATUS "Deps contains: ${CHECK_DIR_FILES}")
+  #execute_process(
+  #  COMMAND ls -la /Users/runner/work/vertical-canvas/vertical-canvas/.deps/obs-studio-v31.0.3.20250525
+  #  OUTPUT_VARIABLE CHECK_DIR_FILES
+  #  OUTPUT_STRIP_TRAILING_WHITESPACE
+  #)
+  #message(STATUS "Working dir: ${dependencies_dir}/${_obs_destination}")
+  #message(STATUS "Deps contains: ${CHECK_DIR_FILES}")
 
   message(STATUS "Configure ${label} (${arch})")
   execute_process(
@@ -209,12 +209,12 @@ function(_check_dependencies)
         message(STATUS "Destination OBS: ${dependencies_dir}/${file} -> ${dependencies_dir}")
         file(ARCHIVE_EXTRACT INPUT "${dependencies_dir}/${file}" DESTINATION "${dependencies_dir}")
 
-        execute_process(
-          COMMAND ls -la /Users/runner/work/vertical-canvas/vertical-canvas/.deps/obs-studio-vertical-31.0.99
-          OUTPUT_VARIABLE CHECK_UNPACKER_FILES
-          OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        message(STATUS "Unpacked folder contains: ${CHECK_UNPACKER_FILES}")
+        #execute_process(
+        #  COMMAND ls -la /Users/runner/work/vertical-canvas/vertical-canvas/.deps/obs-studio-vertical-31.0.99
+        #  OUTPUT_VARIABLE CHECK_UNPACKER_FILES
+        #  OUTPUT_STRIP_TRAILING_WHITESPACE
+        #)
+        #message(STATUS "Unpacked folder contains: ${CHECK_UNPACKER_FILES}")
 
         # Copy files to original OBS folder
 	# execute_process(COMMAND rm "${dependencies_dir}/obs-studio-31.0.99")
