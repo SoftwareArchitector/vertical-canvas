@@ -217,8 +217,8 @@ function(_check_dependencies)
         message(STATUS "Unpacked folder contains: ${CHECK_UNPACKER_FILES}")
 
         # Copy files to original OBS folder
-	execute_process(COMMAND rm "${dependencies_dir}/obs-studio-v31.0.3.20250525")
-	execute_process(COMMAND mv "${dependencies_dir}/obs-studio-vertical-31.0.3.20250525" "${dependencies_dir}/obs-studio-v31.0.3.20250525")
+	# execute_process(COMMAND rm "${dependencies_dir}/obs-studio-v31.0.3.20250525")
+	execute_process(COMMAND cp -r "${dependencies_dir}/obs-studio-vertical-31.0.3.20250525/*" "${dependencies_dir}/obs-studio-v31.0.3.20250525")
       else()
         message(STATUS "Destination other: ${dependencies_dir}/${destination}")
         file(ARCHIVE_EXTRACT INPUT "${dependencies_dir}/${file}" DESTINATION "${dependencies_dir}/${destination}")
