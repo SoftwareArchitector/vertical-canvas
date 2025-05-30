@@ -217,8 +217,10 @@ function(_check_dependencies)
         #message(STATUS "Unpacked folder contains: ${CHECK_UNPACKER_FILES}")
 
         # Copy files to original OBS folder
-	# execute_process(COMMAND rm "${dependencies_dir}/obs-studio-31.0.99")
-	execute_process(COMMAND cp -r "${dependencies_dir}/obs-studio-vertical-31.0.99/." "${dependencies_dir}/obs-studio-31.0.99")
+	# execute_process(COMMAND rm "${dependencies_dir}/obs-studio-31.0.101")
+	#execute_process(COMMAND cp -r "${dependencies_dir}/obs-studio-vertical-31.0.101/." "${dependencies_dir}/obs-studio-31.0.101")
+        message(STATUS "Copy OBS sources to canonica folder: ${dependencies_dir}/obs-studio-vertical-${version} -> ${dependencies_dir}/obs-studio-${version}")
+        execute_process(COMMAND cp -r "${dependencies_dir}/obs-studio-vertical-${version}/." "${dependencies_dir}/obs-studio-${version}")
       else()
         message(STATUS "Destination other: ${dependencies_dir}/${destination}")
         file(ARCHIVE_EXTRACT INPUT "${dependencies_dir}/${file}" DESTINATION "${dependencies_dir}/${destination}")
