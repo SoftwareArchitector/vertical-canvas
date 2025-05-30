@@ -5,7 +5,7 @@
             "baseUrl": "https://github.com/SoftwareArchitector/obs-studio-vertical/archive/refs/tags",
             "label": "OBS sources",
             "hashes": {
-                "macos": "6a0d2401543f450fd411db426a1ea942e5a6a04c6113683893e742f788876a6d",
+                "macos": "4ea0b5b15f309a1c2e2ecee3684edac0fc526b9d9c3f56241c892e5f2b61acbe",
                 "windows-x64": "01478f1b8af5de5f31215b23a1c9d22fb2cfddf94ad8950a23f17e13ac3b29f6"
             }
         },
