@@ -100,7 +100,11 @@ function(_setup_obs_studio)
       -DOBS_VERSION_OVERRIDE:STRING=${_obs_version} "-DCMAKE_PREFIX_PATH='${CMAKE_PREFIX_PATH}'" ${_is_fresh}
       ${_cmake_extra}
     RESULT_VARIABLE _process_result COMMAND_ERROR_IS_FATAL ANY
-    OUTPUT_QUIET)
+    #OUTPUT_QUIET
+    OUTPUT_VARIABLE CMAKE_CONFIG_RESULT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ECHO_OUTPUT_VARIABLE
+  )
   message(STATUS "Configure ${label} (${arch}) - done")
 
   message(STATUS "Build ${label} (${arch})")
