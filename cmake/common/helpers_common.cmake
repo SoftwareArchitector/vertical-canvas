@@ -84,12 +84,20 @@ macro(find_qt)
     message(STATUS "Checking for target Qt::${component}")
 
     if(NOT TARGET Qt::${component} AND TARGET Qt${_QT_VERSION}::${component})
+      message(STATUS "Add library Qt::${component}")
+
       add_library(Qt::${component} INTERFACE IMPORTED)
       set_target_properties(Qt::${component} PROPERTIES INTERFACE_LINK_LIBRARIES Qt${_QT_VERSION}::${component})
+
+      message(STATUS "Set none(1) property for target Qt::${component}")
+      set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
+    else()
+      message(STATUS "Set none(2) property for target Qt::${component}")
+      set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
     endif()
 
-    message(STATUS "Set none property for target Qt::${component}")
-    set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
+    #message(STATUS "Ignore none property for target Qt::${component}")
+    #set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
   endforeach()
 
 endmacro()
