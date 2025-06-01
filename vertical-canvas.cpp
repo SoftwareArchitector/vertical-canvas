@@ -8136,7 +8136,7 @@ void CanvasDock::get_transitions(void *data, struct obs_frontend_source_list *so
 	}
 }
 
-bool CanvasDock::LoadStreamOutputs(obs_data_array_t *outputs)
+bool CanvasDock::LoadStreamOutputs(obs_data_array_t *) // outputs
 {
 	StreamServer ss;
 	ss.stream_server = "rtmp://live.restream.io/live";
