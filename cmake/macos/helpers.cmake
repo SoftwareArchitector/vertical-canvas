@@ -71,7 +71,7 @@ endfunction()
 
 # target_install_resources: Helper function to add resources into bundle
 function(target_install_resources target)
-  message(DEBUG "Installing resources for target ${target}...")
+  message(STATUS "Installing resources for target ${target}...")
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/data")
     file(GLOB_RECURSE data_files "${CMAKE_CURRENT_SOURCE_DIR}/data/*")
     foreach(data_file IN LISTS data_files)
@@ -87,7 +87,7 @@ endfunction()
 
 # target_add_resource: Helper function to add a specific resource to a bundle
 function(target_add_resource target resource)
-  message(DEBUG "Add resource ${resource} to target ${target} at destination ${destination}...")
+  message(STATUS "Add resource ${resource} to target ${target} at destination ${destination}...")
   target_sources(${target} PRIVATE "${resource}")
   set_property(SOURCE "${resource}" PROPERTY MACOSX_PACKAGE_LOCATION Resources)
   source_group("Resources" FILES "${resource}")
