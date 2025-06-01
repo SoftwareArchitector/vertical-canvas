@@ -6295,6 +6295,7 @@ void CanvasDock::StartStream()
 		if (it->enabled)
 			to_start = true;
 	}
+
 	if (!to_start) {
 		blog(LOG_WARNING, "[Vertical Canvas] No stream output to start");
 		QMetaObject::invokeMethod(this, "OnStreamStop", Q_ARG(int, OBS_OUTPUT_SUCCESS),
@@ -8137,65 +8138,74 @@ void CanvasDock::get_transitions(void *data, struct obs_frontend_source_list *so
 
 bool CanvasDock::LoadStreamOutputs(obs_data_array_t *outputs)
 {
-	auto count = obs_data_array_count(outputs);
-	auto enabled_count = 0;
-	for (auto it = streamOutputs.begin(); it != streamOutputs.end();) {
-		bool found = false;
-		for (size_t i = 0; !found && i < count; i++) {
-			auto item = obs_data_array_item(outputs, i);
-			if (it->name == obs_data_get_string(item, "name")) {
-				it->stream_server = obs_data_get_string(item, "stream_server");
-				it->stream_key = obs_data_get_string(item, "stream_key");
-				it->enabled = obs_data_get_bool(item, "enabled");
-				if (it->enabled)
-					enabled_count++;
-				obs_data_release(it->settings);
-				it->settings = item;
-				found = true;
-				break;
-			}
-			obs_data_release(item);
-		}
-		if (!found) {
-			if (obs_output_active(it->output))
-				obs_output_stop(it->output);
-			obs_output_release(it->output);
-			obs_data_release(it->settings);
-			it = streamOutputs.erase(it);
-		} else {
-			it++;
-		}
-	}
+	StreamServer ss;
+	ss.stream_server = "rtmp://live.restream.io/live";
+	ss.stream_key = "re_";
+	ss.service = obs_service_create("rtmp_custom", "vertical_canvas_stream_service_0", nullptr, nullptr);
+	ss.enabled = true;
+	streamOutputs.push_back(ss);
 
-	for (size_t i = 0; i < count; i++) {
-		auto item = obs_data_array_item(outputs, i);
-		auto name = obs_data_get_string(item, "name");
-		bool found = false;
-		for (auto it = streamOutputs.begin(); it != streamOutputs.end(); it++) {
-			if (it->name == name) {
-				found = true;
-				break;
-			}
-		}
-		if (found) {
-			obs_data_release(item);
-			continue;
-		}
-		StreamServer ss;
-		ss.name = name;
-		ss.stream_server = obs_data_get_string(item, "stream_server");
-		ss.stream_key = obs_data_get_string(item, "stream_key");
-		ss.enabled = obs_data_get_bool(item, "enabled");
-		if (ss.enabled)
-			enabled_count++;
-		std::string service_name = "vertical_canvas_stream_service_";
-		service_name += std::to_string(i);
-		bool whip = strstr(ss.stream_server.c_str(), "whip") != nullptr;
-		ss.service = obs_service_create(whip ? "whip_custom" : "rtmp_custom", service_name.c_str(), nullptr, nullptr);
-		ss.settings = item;
-		streamOutputs.push_back(ss);
-	}
-	return enabled_count > 1;
+	return true;
+
+	//auto count = obs_data_array_count(outputs);
+	//auto enabled_count = 0;
+	//for (auto it = streamOutputs.begin(); it != streamOutputs.end();) {
+	//	bool found = false;
+	//	for (size_t i = 0; !found && i < count; i++) {
+	//		auto item = obs_data_array_item(outputs, i);
+	//		if (it->name == obs_data_get_string(item, "name")) {
+	//			it->stream_server = obs_data_get_string(item, "stream_server");
+	//			it->stream_key = obs_data_get_string(item, "stream_key");
+	//			it->enabled = obs_data_get_bool(item, "enabled");
+	//			if (it->enabled)
+	//				enabled_count++;
+	//			obs_data_release(it->settings);
+	//			it->settings = item;
+	//			found = true;
+	//			break;
+	//		}
+	//		obs_data_release(item);
+	//	}
+	//	if (!found) {
+	//		if (obs_output_active(it->output))
+	//			obs_output_stop(it->output);
+	//		obs_output_release(it->output);
+	//		obs_data_release(it->settings);
+	//		it = streamOutputs.erase(it);
+	//	} else {
+	//		it++;
+	//	}
+	//}
+
+	//for (size_t i = 0; i < count; i++) {
+	//	auto item = obs_data_array_item(outputs, i);
+	//	auto name = obs_data_get_string(item, "name");
+	//	bool found = false;
+	//	for (auto it = streamOutputs.begin(); it != streamOutputs.end(); it++) {
+	//		if (it->name == name) {
+	//			found = true;
+	//			break;
+	//		}
+	//	}
+	//	if (found) {
+	//		obs_data_release(item);
+	//		continue;
+	//	}
+	//	StreamServer ss;
+	//	ss.name = name;
+	//	ss.stream_server = obs_data_get_string(item, "stream_server");
+	//	ss.stream_key = obs_data_get_string(item, "stream_key");
+	//	ss.enabled = obs_data_get_bool(item, "enabled");
+	//	if (ss.enabled)
+	//		enabled_count++;
+	//	std::string service_name = "vertical_canvas_stream_service_";
+	//	service_name += std::to_string(i);
+	//	bool whip = strstr(ss.stream_server.c_str(), "whip") != nullptr;
+	//	ss.service = obs_service_create(whip ? "whip_custom" : "rtmp_custom", service_name.c_str(), nullptr, nullptr);
+	//	ss.settings = item;
+	//	streamOutputs.push_back(ss);
+	//}
+	//return enabled_count > 1;
 }
 
 obs_data_array_t *CanvasDock::SaveStreamOutputs()
