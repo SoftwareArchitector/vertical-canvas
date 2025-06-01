@@ -80,6 +80,8 @@ macro(find_qt)
   endif()
 
   # Check for versionless targets of each requested component and create if necessary
+  message (STATUS "Checking components: ${qt_components}")
+
   foreach(component IN LISTS qt_components)
     message(STATUS "Checking for target Qt::${component}")
 
@@ -93,7 +95,7 @@ macro(find_qt)
       set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
     else()
       message(STATUS "Set none(2) property for target Qt::${component}")
-      set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
+      #set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
     endif()
 
     #message(STATUS "Ignore none property for target Qt::${component}")
