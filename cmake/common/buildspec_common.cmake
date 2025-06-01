@@ -99,13 +99,14 @@ function(_setup_obs_studio)
       -DOBS_CMAKE_VERSION:STRING=${_cmake_version} -DENABLE_PLUGINS:BOOL=OFF -DENABLE_UI:BOOL=OFF
       -DOBS_VERSION_OVERRIDE:STRING=${_obs_version} "-DCMAKE_PREFIX_PATH='${CMAKE_PREFIX_PATH}'" ${_is_fresh}
       ${_cmake_extra}
-    RESULT_VARIABLE _process_result COMMAND_ERROR_IS_FATAL ANY
+    RESULT_VARIABLE _process_result 
+    #COMMAND_ERROR_IS_FATAL ANY
     #OUTPUT_QUIET
     OUTPUT_VARIABLE CMAKE_CONFIG_RESULT
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ECHO_OUTPUT_VARIABLE
   )
-  message(STATUS "Configure ${label} (${arch}) - done")
+  message(STATUS "Configure ${label} (${arch}): ${CMAKE_CONFIG_RESULT}")
 
   message(STATUS "Build ${label} (${arch})")
   execute_process(
