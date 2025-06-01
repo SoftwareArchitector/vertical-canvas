@@ -81,11 +81,14 @@ macro(find_qt)
 
   # Check for versionless targets of each requested component and create if necessary
   foreach(component IN LISTS qt_components)
-    message(DEBUG "Checking for target Qt::${component}")
+    message(STATUS "Checking for target Qt::${component}")
+
     if(NOT TARGET Qt::${component} AND TARGET Qt${_QT_VERSION}::${component})
       add_library(Qt::${component} INTERFACE IMPORTED)
       set_target_properties(Qt::${component} PROPERTIES INTERFACE_LINK_LIBRARIES Qt${_QT_VERSION}::${component})
     endif()
+
+    message(STATUS "Set none property for target Qt::${component}")
     set_property(TARGET Qt::${component} PROPERTY INTERFACE_COMPILE_FEATURES "")
   endforeach()
 
