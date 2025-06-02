@@ -6048,7 +6048,7 @@ void CanvasDock::PatchMainUrl() {
 					obs_service_update(mainService, s);
 					obs_data_release(s);
 
-					blog(LOG_INFO, "[Vertical Canvas] Horizontal stream url changed, url=%s", url);
+					blog(LOG_INFO, "[Vertical Canvas] Horizontal stream url changed, url=%s", url.c_str());
 				}
 			}
 		}
