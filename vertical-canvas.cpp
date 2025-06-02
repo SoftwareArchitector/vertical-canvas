@@ -161,6 +161,10 @@ void frontend_event(obs_frontend_event event, void *private_data)
 		for (const auto &it : canvas_docks) {
 			QMetaObject::invokeMethod(it, "MainStreamStart", Qt::QueuedConnection);
 		}
+	} else if (event == OBS_FRONTEND_EVENT_STREAMING_STARTING) {
+		for (const auto &it : canvas_docks) {
+			QMetaObject::invokeMethod(it, "MainStreamStarting", Qt::DirectConnection);
+		}
 	} else if (event == OBS_FRONTEND_EVENT_STREAMING_STOPPING || event == OBS_FRONTEND_EVENT_STREAMING_STOPPED) {
 		for (const auto &it : canvas_docks) {
 			QMetaObject::invokeMethod(it, "MainStreamStop", Qt::QueuedConnection);
@@ -1242,12 +1246,17 @@ CanvasDock::CanvasDock(obs_data_t *settings, QWidget *parent)
 	streamButton->setMinimumHeight(30);
 	streamButton->setObjectName(QStringLiteral("canvasStream"));
 	streamButton->setIcon(streamInactiveIcon);
-	streamButton->setCheckable(true);
-	streamButton->setChecked(false);
-	streamButton->setToolTip(QString::fromUtf8(obs_module_text("StreamVertical")));
-	streamButton->setStyleSheet(
-		QString::fromUtf8("QPushButton:checked{background: rgb(0,210,153);}") +
-		QString::fromUtf8(multi_rtmp ? "QPushButton{border-top-right-radius: 0; border-bottom-right-radius: 0;}" : ""));
+	streamButton->setCheckable(false); // true
+	// streamButton->setChecked(false);
+	streamButton->setText("Autostart enabled"); // TODO Make lang
+	streamButton->setToolTip(QString::fromUtf8(obs_module_text("EnableDisableStreamVertical")));
+
+	//streamButton->setStyleSheet(
+	//	QString::fromUtf8("QPushButton:checked{background: rgb(0,210,153);}") +
+	//	QString::fromUtf8(multi_rtmp ? "QPushButton{border-top-right-radius: 0; border-bottom-right-radius: 0;}" : ""));
+
+	// streamButton->setStyleSheet(QString::fromUtf8("QPushButton{background: rgb(0,0,0);}"));
+
 	connect(streamButton, SIGNAL(clicked()), this, SLOT(StreamButtonClicked()));
 	streamButtonGroup->layout()->addWidget(streamButton);
 
@@ -1263,7 +1272,7 @@ CanvasDock::CanvasDock(obs_data_t *settings, QWidget *parent)
 	streamButtonMulti->setStyleSheet(
 		QString::fromUtf8("QPushButton{width: 16px; border-top-left-radius: 0; border-bottom-left-radius: 0;}"));
 	streamButtonMulti->setVisible(multi_rtmp);
-	streamButtonGroup->layout()->addWidget(streamButtonMulti);
+	//streamButtonGroup->layout()->addWidget(streamButtonMulti);
 
 	buttonRow->addWidget(streamButtonGroup);
 
@@ -1406,7 +1415,10 @@ CanvasDock::CanvasDock(obs_data_t *settings, QWidget *parent)
 			streamButtonText = t.toString(t.hour() ? "hh:mm:ss" : "mm:ss");
 			break;
 		}
-		if (streamButton->text() != streamButtonText) {
+
+		// Show stream time on Stream Button
+		if (!streamButtonText.isEmpty() && streamButton->text() != streamButtonText && enable_vertical) {
+			streamButton->setStyleSheet(QString::fromUtf8("QPushButton{background: rgb(0,210,153);}"));
 			streamButton->setText(streamButtonText);
 		}
 	});
@@ -5948,17 +5960,32 @@ void CanvasDock::replay_output_stop(void *data, calldata_t *calldata)
 
 void CanvasDock::StreamButtonClicked()
 {
+	enable_vertical = !enable_vertical;
+	// TODO Save settings
 
-	int active_count = 0;
-	for (auto it = streamOutputs.begin(); it != streamOutputs.end(); ++it) {
-		if (obs_output_active(it->output))
-			active_count++;
+	if (!enable_vertical) {
+		int active_count = 0;
+		for (auto it = streamOutputs.begin(); it != streamOutputs.end(); ++it) {
+			if (obs_output_active(it->output))
+				active_count++;
+		}
+		if (active_count > 0) {
+			StopStream();
+			return;
+		}
 	}
-	if (active_count > 0) {
-		StopStream();
-		return;
+
+	if (enable_vertical) {
+		streamButton->setStyleSheet(QString::fromUtf8(""));
+		streamButton->setIcon(streamInactiveIcon);
+		streamButton->setText("Autostart enabled"); // TODO Make lang
+	} else {
+		streamButton->setStyleSheet(QString::fromUtf8(""));
+		streamButton->setIcon(QIcon());
+		streamButton->setText("Autostart disabled"); // TODO Make lang
 	}
-	StartStream();
+
+	//StartStream();
 }
 
 void CanvasDock::StreamButtonMultiMenu(QMenu *menu)
@@ -5986,6 +6013,45 @@ void CanvasDock::StreamButtonMultiMenu(QMenu *menu)
 		menu->addAction(QString::fromUtf8(obs_module_text("StartAll")), [this] { StartStream(); });
 	} else {
 		menu->addAction(QString::fromUtf8(obs_module_text("StopAll")), [this] { StopStream(); });
+	}
+}
+
+
+void CanvasDock::PatchMainUrl() {
+#ifdef _WIN32
+	auto handle = os_dlopen("obs");
+#else
+	auto handle = dlopen(nullptr, RTLD_LAZY);
+#endif
+
+	auto service_func = (obs_service_t * (*)(const char *)) os_dlsym(handle, "obs_get_service_by_name");
+	if (service_func) {
+		obs_service_t *mainService = service_func("default_service");
+
+		if (mainService) {
+			auto info_func =
+				(const char *(*)(obs_service_t *, uint32_t))os_dlsym(handle, "obs_service_get_connect_info");
+
+			if (info_func) {
+				std::string url = info_func(mainService, 0); // OBS_SERVICE_CONNECT_INFO_SERVER_URL
+				std::string key = info_func(mainService, 2); // OBS_SERVICE_CONNECT_INFO_STREAM_KEY
+
+				auto addressPos = url.find(".restream.io"); // TODO Case ?
+				auto appPos = url.rfind("/live");
+
+				// TODO Show error and disable autostart if addressPos is correct but appPos is absent
+				if (addressPos != std::string::npos && appPos != std::string::npos) {
+					url.replace(appPos, 5, "/horizontal");
+
+					auto s = obs_data_create();
+					obs_data_set_string(s, "server", url.c_str());
+					obs_service_update(mainService, s);
+					obs_data_release(s);
+
+					blog(LOG_INFO, "[Vertical Canvas] Horizontal stream url changed, url=%s", url);
+				}
+			}
+		}
 	}
 }
 
@@ -6445,7 +6511,8 @@ void CanvasDock::StartStream()
 
 void CanvasDock::StopStream()
 {
-	streamButton->setChecked(false);
+	// streamButton->setChecked(false);
+
 	bool done = false;
 	for (auto it = streamOutputs.begin(); it != streamOutputs.end(); ++it) {
 		if (obs_output_active(it->output)) {
@@ -6453,8 +6520,21 @@ void CanvasDock::StopStream()
 			done = true;
 		}
 	}
+
 	if (done)
 		SendVendorEvent("streaming_stopping");
+
+	if (enable_vertical) {
+		streamButton->setStyleSheet(QString::fromUtf8(""));
+		streamButton->setIcon(streamInactiveIcon);
+		streamButton->setText("Autostart enabled"); // TODO Make lang
+	} else {
+		streamButton->setStyleSheet(QString::fromUtf8(""));
+		streamButton->setIcon(QIcon());
+		streamButton->setText("Autostart disabled"); // TODO Make lang
+	}
+
+
 	CheckReplayBuffer();
 }
 
@@ -7221,10 +7301,10 @@ void CanvasDock::OnReplaySaved()
 
 void CanvasDock::OnStreamStart()
 {
-	streamButton->setChecked(true);
+	//streamButton->setChecked(true);
 	streamButton->setIcon(streamActiveIcon);
-	streamButton->setText("00:00");
-	streamButton->setChecked(true);
+	streamButton->setText("Starting"); // TODO Make lang
+	//streamButton->setChecked(true);
 	CheckReplayBuffer(true);
 }
 
@@ -7242,10 +7322,18 @@ void CanvasDock::OnStreamStop(int code, QString last_error, QString stream_serve
 		}
 	}
 	if (!active) {
-		streamButton->setChecked(false);
-		streamButton->setIcon(streamInactiveIcon);
-		streamButton->setText("");
-		streamButton->setChecked(false);
+		// streamButton->setChecked(false);
+		if (enable_vertical) {
+			streamButton->setStyleSheet(QString::fromUtf8(""));
+			streamButton->setIcon(streamInactiveIcon);
+			streamButton->setText("Autostart enabled");  // TODO Make lang
+		}
+		else {
+			streamButton->setStyleSheet(QString::fromUtf8(""));
+			streamButton->setIcon(QIcon());
+			streamButton->setText("Autostart disabled"); // TODO Make lang
+		}
+		// streamButton->setChecked(false);
 	}
 	const char *errorDescription = "";
 
@@ -7439,12 +7527,15 @@ bool CanvasDock::start_streaming_hotkey(void *data, obs_hotkey_pair_id id, obs_h
 	UNUSED_PARAMETER(hotkey);
 	if (!pressed)
 		return false;
+
 	const auto d = static_cast<CanvasDock *>(data);
 	for (auto it = d->streamOutputs.begin(); it != d->streamOutputs.end(); ++it)
 		if (obs_output_active(it->output))
 			return false;
-	QMetaObject::invokeMethod(d, "StreamButtonClicked");
-	return true;
+
+	// QMetaObject::invokeMethod(d, "StreamButtonClicked");
+	// return true;
+	return false;
 }
 
 bool CanvasDock::stop_streaming_hotkey(void *data, obs_hotkey_pair_id id, obs_hotkey_t *hotkey, bool pressed)
@@ -7460,8 +7551,10 @@ bool CanvasDock::stop_streaming_hotkey(void *data, obs_hotkey_pair_id id, obs_ho
 			found = true;
 	if (!found)
 		return false;
-	QMetaObject::invokeMethod(d, "StreamButtonClicked");
-	return true;
+
+	// QMetaObject::invokeMethod(d, "StreamButtonClicked");
+	// return true;
+	return false;
 }
 
 bool CanvasDock::pause_recording_hotkey(void *data, obs_hotkey_pair_id id, obs_hotkey_t *hotkey, bool pressed)
@@ -7573,12 +7666,22 @@ QIcon CanvasDock::GetGroupIcon() const
 	return main_window->property("groupIcon").value<QIcon>();
 }
 
+void CanvasDock::MainStreamStarting()
+{
+	blog(LOG_INFO, "[Vertical Canvas] Main stream starting");
+
+	if (enable_vertical)
+		PatchMainUrl();
+}
+
 void CanvasDock::MainStreamStart()
 {
 	blog(LOG_INFO, "[Vertical Canvas] Main stream start");
 
 	CheckReplayBuffer(true);
-	if (streamingMatchMain || true)
+
+	// if (streamingMatchMain || true)
+	if (enable_vertical)
 		StartStream();
 }
 
@@ -7587,8 +7690,8 @@ void CanvasDock::MainStreamStop()
 	blog(LOG_INFO, "[Vertical Canvas] Main stream stop");
 
 	CheckReplayBuffer();
-	if (streamingMatchMain || true)
-		StopStream();
+	// if (streamingMatchMain || true)
+	StopStream();
 }
 
 void CanvasDock::MainRecordStart()
@@ -8145,7 +8248,7 @@ bool CanvasDock::LoadStreamOutputs(obs_data_array_t *) // outputs
 	ss.enabled = true;
 	streamOutputs.push_back(ss);
 
-	return true;
+	return false;
 
 	//auto count = obs_data_array_count(outputs);
 	//auto enabled_count = 0;
@@ -8270,14 +8373,14 @@ void CanvasDock::UpdateMulti()
 	if (enabled_count > 1 && !multi_rtmp) {
 		streamButtonMulti->setVisible(true);
 		multi_rtmp = true;
-		streamButton->setChecked(active_count > 0);
-		streamButton->setStyleSheet(QString::fromUtf8(
-			"QPushButton:checked{background: rgb(0,210,153);} QPushButton{border-top-right-radius: 0; border-bottom-right-radius: 0;}"));
+		//streamButton->setChecked(active_count > 0);
+		//streamButton->setStyleSheet(QString::fromUtf8(
+		//	"QPushButton:checked{background: rgb(0,210,153);} QPushButton{border-top-right-radius: 0; border-bottom-right-radius: 0;}"));
 	} else if (enabled_count <= 1 && multi_rtmp) {
 		streamButtonMulti->setVisible(false);
 		multi_rtmp = false;
-		streamButton->setChecked(active_count > 0);
-		streamButton->setStyleSheet(QString::fromUtf8("QPushButton:checked{background: rgb(0,210,153);}"));
+		//streamButton->setChecked(active_count > 0);
+		//streamButton->setStyleSheet(QString::fromUtf8("QPushButton:checked{background: rgb(0,210,153);}"));
 	}
 }
 
