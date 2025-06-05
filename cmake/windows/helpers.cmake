@@ -15,7 +15,7 @@ function(set_target_properties_plugin target)
   set(multiValueArgs PROPERTIES)
   cmake_parse_arguments(PARSE_ARGV 0 _STPO "${options}" "${oneValueArgs}" "${multiValueArgs}")
 
-  message(DEBUG "Setting additional properties for target ${target}...")
+  message(STATUS "Setting additional properties for target ${target}...")
 
   while(_STPO_PROPERTIES)
     list(POP_FRONT _STPO_PROPERTIES key value)
@@ -80,7 +80,7 @@ endfunction()
 
 # Helper function to add resources into bundle
 function(target_install_resources target)
-  message(DEBUG "Installing resources for target ${target}...")
+  message(STATUS "Installing resources for target ${target}...")
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/data")
     file(GLOB_RECURSE data_files "${CMAKE_CURRENT_SOURCE_DIR}/data/*")
     foreach(data_file IN LISTS data_files)
@@ -111,7 +111,7 @@ endfunction()
 
 # Helper function to add a specific resource to a bundle
 function(target_add_resource target resource)
-  message(DEBUG "Add resource '${resource}' to target ${target} at destination '${target_destination}'...")
+  message(STATUS "Add resource '${resource}' to target ${target} at destination '${target_destination}'...")
 
   install(
     FILES "${resource}"

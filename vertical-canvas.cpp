@@ -6018,41 +6018,43 @@ void CanvasDock::StreamButtonMultiMenu(QMenu *menu)
 
 
 void CanvasDock::PatchMainUrl() {
-#ifdef _WIN32
-	auto handle = os_dlopen("obs");
-#else
-	auto handle = dlopen(nullptr, RTLD_LAZY);
-#endif
+	// TODO temporary use old /live application without patching
 
-	auto service_func = (obs_service_t * (*)(const char *)) os_dlsym(handle, "obs_get_service_by_name");
-	if (service_func) {
-		obs_service_t *mainService = service_func("default_service");
-
-		if (mainService) {
-			auto info_func =
-				(const char *(*)(obs_service_t *, uint32_t))os_dlsym(handle, "obs_service_get_connect_info");
-
-			if (info_func) {
-				std::string url = info_func(mainService, 0); // OBS_SERVICE_CONNECT_INFO_SERVER_URL
-				std::string key = info_func(mainService, 2); // OBS_SERVICE_CONNECT_INFO_STREAM_KEY
-
-				auto addressPos = url.find(".restream.io"); // TODO Case ?
-				auto appPos = url.rfind("/live");
-
-				// TODO Show error and disable autostart if addressPos is correct but appPos is absent
-				if (addressPos != std::string::npos && appPos != std::string::npos) {
-					url.replace(appPos, 5, "/horizontal");
-
-					auto s = obs_data_create();
-					obs_data_set_string(s, "server", url.c_str());
-					obs_service_update(mainService, s);
-					obs_data_release(s);
-
-					blog(LOG_INFO, "[Vertical Canvas] Horizontal stream url changed, url=%s", url.c_str());
-				}
-			}
-		}
-	}
+//#ifdef _WIN32
+//	auto handle = os_dlopen("obs");
+//#else
+//	auto handle = dlopen(nullptr, RTLD_LAZY);
+//#endif
+//
+//	auto service_func = (obs_service_t * (*)(const char *)) os_dlsym(handle, "obs_get_service_by_name");
+//	if (service_func) {
+//		obs_service_t *mainService = service_func("default_service");
+//
+//		if (mainService) {
+//			auto info_func =
+//				(const char *(*)(obs_service_t *, uint32_t))os_dlsym(handle, "obs_service_get_connect_info");
+//
+//			if (info_func) {
+//				std::string url = info_func(mainService, 0); // OBS_SERVICE_CONNECT_INFO_SERVER_URL
+//				std::string key = info_func(mainService, 2); // OBS_SERVICE_CONNECT_INFO_STREAM_KEY
+//
+//				auto addressPos = url.find(".restream.io"); // TODO Case ?
+//				auto appPos = url.rfind("/live");
+//
+//				// TODO Show error and disable autostart if addressPos is correct but appPos is absent
+//				if (addressPos != std::string::npos && appPos != std::string::npos) {
+//					url.replace(appPos, 5, "/horizontal");
+//
+//					auto s = obs_data_create();
+//					obs_data_set_string(s, "server", url.c_str());
+//					obs_service_update(mainService, s);
+//					obs_data_release(s);
+//
+//					blog(LOG_INFO, "[Vertical Canvas] Horizontal stream url changed, url=%s", url.c_str());
+//				}
+//			}
+//		}
+//	}
 }
 
 void CanvasDock::StartStreamOutput(std::vector<StreamServer>::iterator it)
@@ -6228,7 +6230,7 @@ void CanvasDock::CreateStreamOutput(std::vector<StreamServer>::iterator it)
 				obs_service_update(it->service, s);
 				obs_data_release(s);
 
-				blog(LOG_INFO, "[Vertical Canvas] Setup restream output, url=%s", url);
+				blog(LOG_INFO, "[Vertical Canvas] Setup restream output, url=%s", mainUrl.c_str());
 			}
 		}
 		os_dlclose(handle);
